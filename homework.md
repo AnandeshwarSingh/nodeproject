@@ -9,3 +9,5 @@
 - What are dependencies
 - What is the use of "-g" while npm install
 - Difference between caret and tilde (^ vs ~)
+
+-Order of the routes matter a lot
