@@ -1,0 +1,20 @@
+{
+  "name": "nodeproject",
+  "version": "1.0.0",
+  "description": "project for dev",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon src/app.js"
+  },
+  "keywords": [
+    "nodejs",
+    "javascript",
+    "Express"
+  ],
+  "author": "Anandeshwar",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.3.0"
+  }
+}
