@@ -2,6 +2,10 @@ const express = require("express");
 
 const app = express();
 
+app.use("/user", (req, res) => {
+  res.send("Hahahahahhahaha");
+});
+
 app.use("/hello/2", (req, res) => {
   res.send(
     "Kdak sing k khadane se khadakti hai khidkiya khidkiyon k kdakne se khadakte hai khadak Singh.",
@@ -15,6 +19,10 @@ app.get("/user", (req, res) => {
 app.post("/user", (req, res) => {
   console.log("Data received in the server:");
   res.send("Data successfully saved in the database");
+});
+
+app.delete("/user", (req, res) => {
+  res.send("Data successfully deleted from the database");
 });
 
 app.use("/hello", (req, res) => {
