@@ -8,6 +8,15 @@ app.use("/hello/2", (req, res) => {
   );
 });
 
+app.get("/user", (req, res) => {
+  res.send({ "first name": "Anand", "last name": "Singh" });
+});
+
+app.post("/user", (req, res) => {
+  console.log("Data received in the server:");
+  res.send("Data successfully saved in the database");
+});
+
 app.use("/hello", (req, res) => {
   res.send("Hello, from hello path!");
 });
