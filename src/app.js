@@ -19,6 +19,71 @@ app.post("/signup", async (req, res) => {
   }
 });
 
+//Get user by email
+
+app.get("/user", async (req, res) => {
+  const userEmail = req.body.email;
+
+  try {
+    const user = await User.find({ email: userEmail });
+    if (user.length === 0) {
+      return res.status(404).send("User not found");
+    }
+    res.send(user);
+  } catch (error) {
+    res
+      .status(500)
+      .send("Something went wrong while fetching the user: " + error.message);
+  }
+});
+
+// Feed API -- GET /feed - get all the users from the database
+
+app.get("/feed", async (req, res) => {
+  try {
+    const users = await User.find({});
+    res.send(users);
+  } catch (error) {
+    res
+      .status(500)
+      .send("Something went wrong while fetching the users: " + error.message);
+  }
+});
+
+app.delete("/user", async (req, res) => {
+  console.log(req.body);
+  const userId = req.body.userId;
+  try {
+    const deletedUser = await User.findByIdAndDelete(userId);
+    if (!deletedUser) {
+      return res.status(404).send("User not found");
+    } else {
+      res.send("User deleted successfully");
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .send("Something went wrong while deleting the user: " + error.message);
+  }
+});
+
+//update the data of the user
+
+app.patch("/user", async (req, res) => {
+  const userId = req.body.userId;
+  const data = req.body;
+  try {
+    const updatedUser = await User.findByIdAndUpdate({ _id: userId }, data, {
+      returnDocument: "after",
+    });
+    res.send(updatedUser);
+  } catch (error) {
+    res
+      .status(500)
+      .send("Something went wrong while updating the user: " + error.message);
+  }
+});
+
 connectDB()
   .then(() => {
     console.log("Database connected successfully");
