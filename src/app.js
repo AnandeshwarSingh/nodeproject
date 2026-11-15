@@ -57,8 +57,9 @@ app.post("/login", async (req, res) => {
       return res.status(401).send("Invalid credentials");
     }
 
-    const token = await jwt.sign({ _Id: user._id }, "Anand@#$123");
-    console.log(token);
+    const token = await jwt.sign({ _Id: user._id }, "Anand@#$123", {
+      expiresIn: "1d",
+    });
 
     // Create a JWT token and Add the tokent to cookies send the response back to user
     res.cookie("token", token, {
@@ -82,91 +83,14 @@ app.get("/profile", userAuth, async (req, res) => {
   }
 });
 
-//Get user by email
-
-app.get("/user", async (req, res) => {
-  const userEmail = req.body.email;
-
+app.post("/sendConnectionRequest", userAuth, async (req, res) => {
   try {
-    const user = await User.find({ email: userEmail });
-    if (user.length === 0) {
-      return res.status(404).send("User not found");
-    }
-    res.send(user);
+    const user = req.user;
+
+    console.log("Sending a connection request");
+    res.send(user.firstName + " is sending request");
   } catch (error) {
-    res
-      .status(500)
-      .send("Something went wrong while fetching the user: " + error.message);
-  }
-});
-
-// Feed API -- GET /feed - get all the users from the database
-
-app.get("/feed", async (req, res) => {
-  try {
-    const users = await User.find({});
-    res.send(users);
-  } catch (error) {
-    res
-      .status(500)
-      .send("Something went wrong while fetching the users: " + error.message);
-  }
-});
-
-app.delete("/user", async (req, res) => {
-  console.log(req.body);
-  const userId = req.body.userId;
-  try {
-    const deletedUser = await User.findByIdAndDelete(userId);
-    if (!deletedUser) {
-      return res.status(404).send("User not found");
-    } else {
-      res.send("User deleted successfully");
-    }
-  } catch (error) {
-    res
-      .status(500)
-      .send("Something went wrong while deleting the user: " + error.message);
-  }
-});
-
-//update the data of the user
-
-app.patch("/user/:userId", async (req, res) => {
-  const userId = req.params?.userId;
-  const data = req.body;
-
-  try {
-    const ALLOWED_UPDATES = [
-      "email",
-      "photoUrl",
-      "about",
-      "skills",
-      "age",
-      "gender",
-    ];
-
-    const isUpdateAllowed = Object.keys(data).every((key) =>
-      ALLOWED_UPDATES.includes(key),
-    );
-
-    if (!isUpdateAllowed) {
-      throw new Error("Invalid update fields");
-    }
-
-    if (data?.skills.length > 10) {
-      throw new Error("Skills cannot be more than 10");
-    }
-
-    const updatedUser = await User.findByIdAndUpdate({ _id: userId }, data, {
-      returnDocument: "after",
-      runValidators: true,
-    });
-    res.send(updatedUser);
-  } catch (error) {
-    res
-      .status(500)
-      .send("Something went wrong while updating the user: " + error.message);
+    res.status(500).send("Error sending connection request: " + error.message);
   }
 });
 
