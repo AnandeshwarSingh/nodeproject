@@ -44,26 +44,19 @@ app.post("/signup", async (req, res) => {
 app.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-
-    // Find the user by email
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).send("User not found");
     }
 
     // Compare the provided password with the hashed password
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.user.validatePassword(password);
     if (!isMatch) {
       return res.status(401).send("Invalid credentials");
     }
 
-    const token = await jwt.sign({ _Id: user._id }, "Anand@#$123", {
-      expiresIn: "1d",
-    });
-
-    // Create a JWT token and Add the tokent to cookies send the response back to user
+    const token = await user.getJWT();
     res.cookie("token", token, {
-      httpOnly: true,
       secure: process.env.NODE_ENV === "production", // Set to true in production
     });
 
