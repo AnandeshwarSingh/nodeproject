@@ -6,7 +6,7 @@ const userSchema = new mongoose.Schema(
     firstName: {
       type: String,
       required: true,
-      minLength: 3,
+      minlength: 3,
     },
     lastName: {
       type: String,
@@ -30,6 +30,7 @@ const userSchema = new mongoose.Schema(
         if (!validator.isStrongPassword(value)) {
           throw new Error("Password is not strong enough");
         }
+      },
     },
     age: {
       type: Number,
@@ -64,7 +65,7 @@ const userSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  },
+  }
 );
 
 const User = mongoose.model("User", userSchema);

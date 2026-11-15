@@ -2,6 +2,13 @@ const express = require("express");
 const connectDB = require("./config/database.js");
 const User = require("./models/user.js");
 const app = express();
+const validateSignUpData = require("./utils/validation");
+const bcrypt = require("bcrypt");
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
+const { userAuth } = require("./middlewares/auth.js");
+
+app.use(cookieParser());
 
 app.use(express.json());
 
@@ -10,12 +17,68 @@ app.post("/signup", async (req, res) => {
 
   // creating a new user instance of user model
   const user = new User(req.body);
+
+  const { firstName, lastName, email, password } = req.body;
+
   try {
+    validateSignUpData(req);
+    //Encrypt thr Password
+
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    const user = new User({
+      firstName,
+      lastName,
+      email,
+      password: passwordHash,
+    });
+
     await user.save();
     res.send("User created successfully");
   } catch (error) {
     console.error("Error creating user:", error);
     res.status(500).send("Error creating user: " + error.message);
+  }
+});
+
+app.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Find the user by email
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+
+    // Compare the provided password with the hashed password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).send("Invalid credentials");
+    }
+
+    const token = await jwt.sign({ _Id: user._id }, "Anand@#$123");
+    console.log(token);
+
+    // Create a JWT token and Add the tokent to cookies send the response back to user
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // Set to true in production
+    });
+
+    res.send("Login successful");
+  } catch (error) {
+    res.status(500).send("Error logging in: " + error.message);
+  }
+});
+
+app.get("/profile", userAuth, async (req, res) => {
+  // Implementation for fetching user profile
+  try {
+    const user = req.user; // Access the authenticated user from the request
+    res.send(user);
+  } catch (error) {
+    res.status(500).send("Error fetching profile: " + error.message);
   }
 });
 
