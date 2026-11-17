@@ -2,13 +2,18 @@ const express = require("express");
 
 const authRoutes = express.Router();
 
+const validateSignUpData = require("../utils/validation");
+const User = require("../models/user");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+
 authRoutes.post("/signup", async (req, res) => {
   console.log(req.body);
 
   // creating a new user instance of user model
   const user = new User(req.body);
 
-  const { firstName, lastName, email, password } = req.body;
+  const { firstName, lastName, email, password, age } = req.body;
 
   try {
     validateSignUpData(req);
@@ -21,6 +26,7 @@ authRoutes.post("/signup", async (req, res) => {
       lastName,
       email,
       password: passwordHash,
+      age,
     });
 
     await user.save();
@@ -40,7 +46,7 @@ authRoutes.post("/login", async (req, res) => {
     }
 
     // Compare the provided password with the hashed password
-    const isMatch = await bcrypt.user.validatePassword(password);
+    const isMatch = await user.validatePassword(password);
     if (!isMatch) {
       return res.status(401).send("Invalid credentials");
     }

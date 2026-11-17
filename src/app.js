@@ -6,11 +6,16 @@ const validateSignUpData = require("./utils/validation");
 const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
-const { userAuth } = require("./middlewares/auth.js");
 
 app.use(cookieParser());
-
 app.use(express.json());
+const authRoutes = require("./routes/auth.js");
+const profileRouter = require("./routes/profile.js");
+const requestRouter = require("./routes/request.js");
+
+app.use("/", authRoutes);
+app.use("/", profileRouter);
+app.use("/", requestRouter);
 
 connectDB()
   .then(() => {
