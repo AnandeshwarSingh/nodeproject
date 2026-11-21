@@ -12,10 +12,12 @@ app.use(express.json());
 const authRoutes = require("./routes/auth.js");
 const profileRouter = require("./routes/profile.js");
 const requestRouter = require("./routes/request.js");
+const userRouter = require("./routes/user.js");
 
 app.use("/", authRoutes);
 app.use("/", profileRouter);
 app.use("/", requestRouter);
+app.use("/", userRouter);
 
 connectDB()
   .then(() => {
