@@ -56,7 +56,7 @@ authRoutes.post("/login", async (req, res) => {
       secure: process.env.NODE_ENV === "production", // Set to true in production
     });
 
-    res.send("Login successful");
+    res.send(user);
   } catch (error) {
     res.status(500).send("Error logging in: " + error.message);
   }
