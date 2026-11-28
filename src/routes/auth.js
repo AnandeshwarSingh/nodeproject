@@ -8,17 +8,10 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 authRoutes.post("/signup", async (req, res) => {
-  console.log(req.body);
-
-  // creating a new user instance of user model
-  const user = new User(req.body);
-
-  const { firstName, lastName, email, password, age } = req.body;
-
   try {
     validateSignUpData(req);
-    //Encrypt thr Password
 
+    const { firstName, lastName, email, password, age } = req.body;
     const passwordHash = await bcrypt.hash(password, 10);
 
     const user = new User({
@@ -26,14 +19,22 @@ authRoutes.post("/signup", async (req, res) => {
       lastName,
       email,
       password: passwordHash,
-      age,
+      ...(age ? { age } : {}),
     });
 
-    await user.save();
-    res.send("User created successfully");
+    const savedUser = await user.save();
+    const token = await savedUser.getJWT();
+    res.cookie("token", token, {
+      secure: process.env.NODE_ENV === "production",
+    });
+
+    res.json({
+      message: "User created successfully",
+      data: savedUser,
+    });
   } catch (error) {
     console.error("Error creating user:", error);
-    res.status(500).send("Error creating user: " + error.message);
+    res.status(400).send("Error creating user: " + error.message);
   }
 });
 

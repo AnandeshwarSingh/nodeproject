@@ -8,6 +8,7 @@ const USER_SAFE_DATA = [
   "firstName",
   "lastName",
   "age",
+  "photoUrl",
   "gender",
   "about",
   "skills",
@@ -67,8 +68,9 @@ userRouter.get("/feed", userAuth, async (req, res) => {
 
     const loggedInUser = req.user;
 
-    const page = parseInt(req.query.page);
-    const limit = parseInt(req.query.limit);
+    const page = Math.max(parseInt(req.query.page) || 1, 1);
+    let limit = parseInt(req.query.limit) || 10;
+    if (limit > 50) limit = 50;
     const skip = (page - 1) * limit;
 
     // Find all connection requests (sent + received)
